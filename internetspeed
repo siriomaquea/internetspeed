@@ -1,0 +1,74 @@
+## --------------------------------------------------
+#################
+## Author: SIRIO MAQUEA ALVES
+## GitHub: @siriomaquea
+## Linkedin: https://www.linkedin.com/in/siriomaqueaalves/
+#################
+## -------------------------------------------------- 
+
+############### VARIABLES OF THE DATE AND HOUR ###########################
+export h=`date +%H`
+export m=`date +%M`
+export s=`date +%S`
+export yyyy=`date +%Y`
+export mm=`date +%m`
+export dd=`date +%d`
+export currenttime=$h:$m:$s
+export currentdate=$yyyy-$mm-$dd
+##################################################################
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+WHITE='\033[1;37m'
+NC='\033[0m' # No Color
+
+
+output=/tmp/speed.log
+
+# ========================================================================================================
+# Super simple function to get speed of internet
+
+PROGRESSO()
+{
+	while true
+	do
+		echo -en "."
+                #sleep .05               # 5 hundredths interval between dots. Can be change.
+				sleep 1
+	done			
+}
+
+# ========================================================================================================
+
+VERIFYSPEED()
+{
+rm -f $output
+speedtest-cli >> $output
+}
+
+PRINTINFO()
+{
+clear
+echo -e ${WHITE}-------- SPEED TEST --------${NC}
+down=`cat $output | awk 'NR==7' | awk '{print $2}'`
+up=`cat $output | awk 'NR==9' | awk '{print $2}'`
+location=`cat $output | awk 'NR==5'`
+ping=`cat $output | awk 'NR==5' | awk 'NF && NF-1 { print ( $(NF-1) ) }'`
+ip=`cat $output | awk 'NR==3' | awk '{print $4}'`
+
+echo -e ""
+echo -e Ip: ${GREEN}$ip${NC}
+echo -e Location: ${GREEN}$location${NC}
+echo -e Ping: ${GREEN}$ping${NC} ms
+echo -e Download: ${GREEN}$down${NC} Mbits/s
+echo -e Upload: ${GREEN}$up${NC} Mbits/s
+}
+
+
+clear
+echo -ne "Aguarde.\nCalculando velocidade da internet."	# Exibe uma mensagem introdutoria.
+PROGRESSO &
+meuprogresso=$!
+VERIFYSPEED
+kill $meuprogresso >/dev/null 2>&1
+PRINTINFO
+exit
